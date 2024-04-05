@@ -186,6 +186,8 @@ board db 0,0,0,0,0,0,0,0,0 ; 1-x, 2 - O
                
     ret           
     endp draw_x        
+    
+    
        
     
     start:      
