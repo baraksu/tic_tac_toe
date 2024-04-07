@@ -4,7 +4,7 @@
 .data   
 
 tempColor dw ?                                 
-
+ 
 color dw 7 
 
 board db 2,2,2,2,2,2,2,2,2 ; 0-x, 1 - O
