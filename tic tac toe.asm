@@ -4,7 +4,7 @@
 .data   
 
 tempColor dw ?                                 
- 
+
 color dw 7 
 
 board db 2,2,2,2,2,2,2,2,2 ; 0-x, 1 - O
@@ -515,11 +515,9 @@ endp check
         cmp bx,1
         jne loopp
         
-        mov ax,cx
-        mov cl, 2h
-        div cl
-        mov cx,ax
-        
+        shr cx,1 
+         
+         
         mov bl,turn
         
         cmp cx,10
