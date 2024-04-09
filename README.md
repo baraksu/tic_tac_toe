@@ -13,6 +13,13 @@
 # דוגמאות
 <img width="240" alt="צילום מסך 2024-04-09 193226" src="https://github.com/baraksu/tic_tac_toe/assets/166244273/c395f10d-cec4-43f2-9c65-a6fddf0549c8">
 <img width="237" alt="צילום מסך 2024-04-09 193458" src="https://github.com/baraksu/tic_tac_toe/assets/166244273/33126e71-cebd-44bd-b27e-af6983d17560">
+<img width="212" alt="צילום מסך 2024-04-09 195952" src="https://github.com/baraksu/tic_tac_toe/assets/166244273/2a661e1b-118d-4181-973c-6b8d519bd05c">
+<img width="212" alt="צילום מסך 2024-04-09 200224" src="https://github.com/baraksu/tic_tac_toe/assets/166244273/ca4f5120-4481-483e-a2a5-c6835f5a355a">
+
+
+
+
+
 
 # שלבי פיתוח
 בשלב הראשון פיתחתי את הפרוצדורה של הקווים על מנת להכין את הלוח
