@@ -718,7 +718,7 @@ endp check
         pop bx
         pop bx
         pop bx
-        
+        pop bx
         jmp endTurn  
         
         
