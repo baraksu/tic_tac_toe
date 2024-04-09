@@ -10,6 +10,15 @@ color dw 7
 board db 2,2,2,2,2,2,2,2,2 ; 0-x, 1 - O
 
 turn db 0
+
+logo db 13,10, " _____ _        _____     _      _____          ",13,10, "|_   _(_) ___  |_   _|_ _| | __ |_   _|__   ___ ",13,10, "  | | | |/ __|   | |/ _` | |/ /   | |/ _ \ / _ \",13,10, "  | | | | (__    | | (_| |   <    | | (_) |  __/",13,10, "  |_| |_|\___|   |_|\__,_|_|\_\   |_|\___/ \___|",13,10,"$"
+
+
+              
+
+pressKeyToStart db 13,10,"Enter any key to start the game!$"
+
+
 .code
     
 
@@ -365,6 +374,24 @@ endp check
     start:      
         mov ax, @data
         mov ds, ax
+        
+        
+        
+        
+        pusha 
+        lea dx,logo
+        mov ah, 09h
+        int 21h   
+        lea dx,pressKeyToStart
+        mov ah, 09h
+        int 21h   
+        mov ah,01h
+        int 21h
+        popa       
+        
+        
+        
+        
         
         mov ah,0 
         mov al, 13h
