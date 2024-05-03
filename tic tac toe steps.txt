@@ -4,3 +4,9 @@
 3. draw circle when the second user presss
 4. calculate result each user turn
 5. mark the result.
+-----------
+Indication whose turn.
+2 colors
+line 488 : ret 8 instead of pop, use macro.
+line 700: use macro for draw x and 0
+Draw column and row sall be macro.
