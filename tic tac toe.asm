@@ -2,20 +2,21 @@
 .stack 100h
 
 .data   
+                                 
 
-; color of game
-color dw 7 
+color dw 7
 
-; board of the game
+
+Xcolor dw 6
+Ocolor dw 1 
+
 board db 2,2,2,2,2,2,2,2,2 ; 0-x, 1 - O
 
-; turn (x = 0, O = 1)
 turn db 0
 
-; logo
 logo db 13,10, " _____ _        _____     _      _____          ",13,10, "|_   _(_) ___  |_   _|_ _| | __ |_   _|__   ___ ",13,10, "  | | | |/ __|   | |/ _` | |/ /   | |/ _ \ / _ \",13,10, "  | | | | (__    | | (_| |   <    | | (_) |  __/",13,10, "  |_| |_|\___|   |_|\__,_|_|\_\   |_|\___/ \___|",13,10,"$"
 
-
+turnTxt db "Turn: X$ "
               
 
 pressKeyToStart db 13,10,"Enter any key to start the game!$"
@@ -23,24 +24,19 @@ pressKeyToStart db 13,10,"Enter any key to start the game!$"
 
 .code
     
-
-    proc draw_column
-    mov bp,sp
-    pusha    
-    ;INT 10h / AH = 0Ch - change color for a single pixel.
-    ;AL = pixel color
-    ;BX = lenght
-    ;CX = column. (x)
-    ;DX = row. (y)
+    
+    draw_column macro tcolor length x y 
+        local columnDrawLoop
+    pusha 
     xor ax,ax
     xor bx,bx
     xor cx,cx
     xor dx,dx
     
-    mov dx, [bp+2]
-    mov cx, [bp+4]
-    mov bx, [bp+6]
-    mov ax, [bp+8]
+    mov dx, y
+    mov cx, x
+    mov bx, length
+    mov ax, tcolor
     
     columnDrawLoop:
         mov ah,0ch
@@ -52,28 +48,23 @@ pressKeyToStart db 13,10,"Enter any key to start the game!$"
     jne columnDrawLoop
      
     popa    
-    ret
-    endp draw_column      
+    endm draw_column
+    
+         
       
      
-    proc draw_row
-    
-    mov bp,sp
-    pusha    
-    ;INT 10h / AH = 0Ch - change color for a single pixel.
-    ;AL = pixel color
-    ;BX = lenght
-    ;CX = column. (x)
-    ;DX = row. (y)
+    draw_row macro tcolor length x y
+        local RowDrawLoop  
+    pusha  
     xor ax,ax
     xor bx,bx
     xor cx,cx
     xor dx,dx
     
-    mov dx, [bp+2]
-    mov cx, [bp+4]
-    mov bx, [bp+6]
-    mov ax, [bp+8]
+    mov dx, y
+    mov cx, x
+    mov bx, length
+    mov ax, tcolor
     
     RowDrawLoop:
         mov ah,0ch
@@ -83,33 +74,17 @@ pressKeyToStart db 13,10,"Enter any key to start the game!$"
         dec bx
         cmp bx,0h
     jne RowDrawLoop
-     
-    popa    
-    ret
-    
-    
-    
-    endp draw_row   
+    popa
+    endm draw_row   
       
     
-    proc draw_diagonal_r
-                      
-    mov bp,sp
-    pusha    
-    ;INT 10h / AH = 0Ch - change color for a single pixel.
-    ;AL = pixel color
-    ;BX = lenght
-    ;CX = column. (x)
-    ;DX = row. (y)
-    xor ax,ax
-    xor bx,bx
-    xor cx,cx
-    xor dx,dx
-    
-    mov dx, [bp+2]
-    mov cx, [bp+4]
-    mov bx, [bp+6]
-    mov ax, [bp+8]
+    draw_diagonal_r macro tcolor length x y
+        local DiagRDrawLoop 
+    pusha  
+    mov dx, y
+    mov cx, x
+    mov bx, length
+    mov ax, tcolor
     
     DiagRDrawLoop:
         mov ah,0ch
@@ -121,28 +96,17 @@ pressKeyToStart db 13,10,"Enter any key to start the game!$"
         cmp bx,0h
     jne DiagRDrawLoop
      
-    popa    
-    ret                              
-    endp draw_diagonal_r
+    popa                                 
+    endm draw_diagonal_r
     
-    proc draw_diagonal_l
-                      
-    mov bp,sp
-    pusha    
-    ;INT 10h / AH = 0Ch - change color for a single pixel.
-    ;AL = pixel color
-    ;BX = lenght
-    ;CX = column. (x)
-    ;DX = row. (y)
-    xor ax,ax
-    xor bx,bx
-    xor cx,cx
-    xor dx,dx
-    
-    mov dx, [bp+2]
-    mov cx, [bp+4]
-    mov bx, [bp+6]
-    mov ax, [bp+8]
+    draw_diagonal_l macro tcolor length x y
+        local DiagLDrawLoop 
+            
+    pusha   
+    mov dx, y
+    mov cx, x
+    mov bx, length
+    mov ax, tcolor
     
     DiagLDrawLoop:
         mov ah,0ch
@@ -154,53 +118,12 @@ pressKeyToStart db 13,10,"Enter any key to start the game!$"
         cmp bx,0h
     jne DiagLDrawLoop
      
-    popa    
-    ret                              
-    endp draw_diagonal_l
-
-    proc draw_x
-               
-        mov bp,sp
-        pusha
-        xor ax,ax
-        xor bx,bx
-        xor cx,cx
-        xor dx,dx
-        
-        mov dx, [bp+2]
-        mov cx, [bp+4]
-        mov bx, [bp+6]
-        mov ax, [bp+8]
-        
-        push ax       
-        push bx
-        push cx
-        push dx
-        call draw_diagonal_r
-        pop bx
-        pop bx
-        pop bx
-        pop bx     
-        
-        mov bx, [bp+6]     
-        add cx,bx      
-        push ax       
-        push bx
-        push cx
-        push dx
-        call draw_diagonal_l
-        pop bx
-        pop bx
-        pop bx
-        pop bx       
-              
-        popa
-               
-    ret           
-    endp draw_x        
+    popa                                  
+    endm draw_diagonal_l
+       
     
     
-proc circle
+proc circle 
  mov bp,sp
  pusha
 
@@ -211,11 +134,11 @@ proc circle
  sub bx,ax ; E=3-2r
  mov [bp+2],bx
  
- mov ax,color ;color goes in al
+ mov ax,Ocolor ;color goes in al
  mov ah,0ch
  
 drawcircle:
- mov ax,color ;color goes in al
+ mov ax,Ocolor ;color goes in al
  mov ah,0ch
  
  mov cx, [bp+4] ;Octonant 1
@@ -308,35 +231,23 @@ ret
 endp circle
 
 
-proc winQ
-mov bp,sp
-      pop ax
-      
-      pop bx
-      cmp [board+bx], 0
+winQ macro x y z
+    local oT no end
+      cmp [board+x], 0
       jne oT
-      
-      pop bx
-      cmp [board+bx], 0
+      cmp [board+y], 0
       jne no
-      
-      pop bx
-      cmp [board+bx], 0
+      cmp [board+z], 0
       jne no
-      
       mov bx, 0
       jmp end
       
       oT:
-      cmp [board+bx], 1
+      cmp [board+x], 1
       jne no
-            
-      pop bx
-      cmp [board+bx], 1
+      cmp [board+y], 1
       jne no
-      
-      pop bx
-      cmp [board+bx], 1
+      cmp [board+z], 1
       jne no
       mov bx,1
       jmp end
@@ -345,15 +256,9 @@ no:
 mov bx,2
 mov sp,100h      
 end:
-
-push ax        
-ret
-endp winQ   
-
+endm winQ  
 proc check
-      
       xor bx,bx
-      
       loopcheck:
         cmp [board+bx],2        
         je e       
@@ -369,17 +274,36 @@ proc check
     e:
       inc bx    
 ret
-endp check
+endp check 
 
 
+writeTextMode macro page location ; page - y,x
+    local print
+    pusha
+    mov dx, page
+    xor bx,bx
+    mov ax, 0200h
+    int 10h
+    mov dl,location 
+    xor bx,bx
+    print:
     
+    mov al, [location+bx]
+    inc bx
+    push bx
+    
+    mov bx,000ch
+    mov ah, 0eh
+    int 10h 
+    pop bx
+
+    cmp [location+bx],'$'
+    jne print
+    popa
+endm writeTextMode
     start:      
         mov ax, @data
         mov ds, ax
-        
-        
-        
-        
         pusha 
         lea dx,logo
         mov ah, 09h
@@ -389,153 +313,24 @@ endp check
         int 21h   
         mov ah,01h
         int 21h
-        popa       
-        
-        
-        
-        
-        
+        popa      
         mov ah,0 
         mov al, 13h
 	    int 10h  
         
-        ;----------------------;
-        ;---------row----------;
-        ;----------------------;
-        ; info:                ;
-        ; 1. color             ;
-        ; 2. length            ;
-        ; 3. X (column)        ;
-        ; 4. Y (row)           ;
-        ;----------------------;
-        
-        
-        
-        push color
-        mov bx,000b4h ; length  
-        push bx
-        mov bx, 0000ah ; x
-        push bx
-        mov bx, 0000ah ;y
-        push bx
-        call draw_row
-        pop bx
-        pop bx
-        pop bx
-        pop bx
-        
-        push color
-        mov bx,000b4h  
-        push bx
-        mov bx, 00046h
-        push bx
-        mov bx,0000ah
-        push bx
-        call draw_row            
-        pop bx
-        pop bx
-        pop bx
-        pop bx
-        
-        push color
-        mov bx,000b4h  
-        push bx
-        mov bx, 00082h
-        push bx
-        mov bx,0000ah
-        push bx
-        call draw_row            
-        pop bx
-        pop bx
-        pop bx
-        pop bx
-        
-        push color
-        mov bx,000b4h  
-        push bx
-        mov bx, 000BEh
-        push bx
-        mov bx,0000ah
-        push bx
-        call draw_row            
-        pop bx
-        pop bx
-        pop bx
-        pop bx
-        
-        ;----------------------;
-        ;--------column--------;
-        ;----------------------;
-        ; info:                ;
-        ; 1. color             ;
-        ; 2. length            ;
-        ; 3. X (column)        ;
-        ; 4. Y (row)           ;
-        ;----------------------;
-              
-        push color
-        mov bx,000b4h
-        push bx
-        mov bx,0000ah
-        push bx
-        mov bx,0000ah
-        push bx
-        call draw_column
-        pop bx
-        pop bx
-        pop bx
-        pop bx
-        
-        
-        push color
-        mov bx,000b4h
-        push bx
-        mov bx,0000ah
-        push bx
-        mov bx,00046h
-        push bx
-        call draw_column
-        pop bx
-        pop bx
-        pop bx
-        pop bx
-        
-        
-        push color
-        mov bx,000b4h
-        push bx
-        mov bx,0000ah
-        push bx
-        mov bx,00082h
-        push bx
-        call draw_column
-        pop bx
-        pop bx
-        pop bx
-        pop bx
-                  
-                  
-        push color
-        mov bx,000b4h
-        push bx
-        mov bx,0000ah
-        push bx
-        mov bx,000BEh
-        push bx
-        call draw_column
-        pop bx
-        pop bx
-        pop bx
-        pop bx          
-        
-        ;----------------------;
-        ;--------GamePlay------;
-        ;----------------------;
+                                     
+        draw_row color 000b4h 0000ah 0000ah 
+        draw_row color 000b4h 00046h 0000ah 
+        draw_row color 000b4h 00082h 0000ah 
+        draw_row color 000b4h 000BEh 0000ah 
+        draw_column color 000b4h 0000ah 0000ah
+        draw_column color 000b4h 0000ah 00046h
+        draw_column color 000b4h 0000ah 00082h
+        draw_column color 000b4h 0000ah 000BEh
+        writeTextMode 0a1ah [turnTxt]
         
         mov ax,0001h
         int 33h
-        
-        
         loopp:
         
         mov ax, 0003h
@@ -608,12 +403,7 @@ endp check
         jb x3y3         
         jmp loopp
         
-        
-        
-        
-        
         x1y1:
-         
          cmp [board], 2
          jne loopp
          mov [board],bl
@@ -674,50 +464,25 @@ endp check
          mov bx,dx
          xor cx,cx
          mov dx, 00019h
-         
-         
-            
           
          cmp turn,0
          je drawX
          jne drawO
         
-        
-        
-        
-        
-        
-        
-        
-        ;----------------------;
-        ;-------Draw X---------;
-        ;----------------------;
-        ; info:                ;
-        ; 1. color             ;
-        ; 2. length            ;
-        ; 3. X (column) - sp   ;
-        ; 4. Y (row) - sp      ;
-        ; (sp = start point)   ;
-        ;----------------------;
-        
-        
         drawX:
-        ;----------------------;
-        ;  info:               ;
-        ;  1. AX - X           ;
-        ;  2. BX - Y           ;
-        ;----------------------; 
+        mov [turnTxt+6], 'O' 
         mov turn, 1
-        push color
-        mov cx, 00032h
-        push cx        
+         
+        
         push ax
-        push bx
-        call draw_x
-        pop bx
-        pop bx
-        pop bx
-        pop bx
+        draw_diagonal_r Xcolor 00032h ax bx 
+        add ax, 00032h
+        draw_diagonal_l Xcolor 00032h ax bx
+        pop ax
+        
+        
+        
+        
         jmp endTurn
         
         ;----------------------;
@@ -733,6 +498,7 @@ endp check
         
         
         drawO:
+        mov [turnTxt+6], 'X'
         mov turn, 0
         add ax,dx
         add bx,dx
@@ -754,63 +520,24 @@ endp check
         endTurn:
         
         mov al, 0 
-        
-        
-               
-        mov bx, 0
-        push bx
-        mov bx, 1
-        push bx
-        mov bx, 2
-        push bx
-        call winQ
+        winQ 0 1 2
         cmp bx, 0
         je winX012
         cmp bx, 1
         je winO012
         jmp w1
         
-        winX012:       
-         mov bx, 11       
-        push bx
-        mov bx,000b4h
-        push bx
-        mov bx,00028h
-        push bx
-        mov bx,0000ah
-        push bx
-        call draw_row
-        pop bx
-        pop bx
-        pop bx
-        pop bx
+        winX012: 
+        draw_row 11 000b4h 00028h 0000ah 
         jmp exit
         
         winO012:       
-         mov bx, 11       
-        push bx
-        mov bx,000b4h
-        push bx
-        mov bx,00028h
-        push bx
-        mov bx,0000ah
-        push bx
-        call draw_row
-        pop bx
-        pop bx
-        pop bx
-        pop bx
+        draw_row 11 000b4h 00028h 0000ah
         jmp exit
          
         
         w1:
-        mov bx, 3
-        push bx
-        mov bx, 4
-        push bx
-        mov bx, 5
-        push bx
-        call winQ
+        winQ 3 4 5
         cmp bx, 0
         je winX345
         cmp bx, 1
@@ -818,46 +545,16 @@ endp check
         jmp w2
            
         winX345:       
-         mov bx, 11       
-        push bx
-        mov bx,000b4h
-        push bx
-        mov bx,00064h
-        push bx
-        mov bx,0000ah
-        push bx
-        call draw_row
-        pop bx
-        pop bx
-        pop bx
-        pop bx
+        draw_row 11 000b4h 00064h 0000ah
         jmp exit
         
         winO345:       
-         mov bx, 11       
-        push bx
-        mov bx,000b4h
-        push bx
-        mov bx,00064h
-        push bx
-        mov bx,0000ah
-        push bx
-        call draw_row
-        pop bx
-        pop bx
-        pop bx
-        pop bx
+        draw_row 11 000b4h 00064h 0000ah
         jmp exit   
         
         
         w2:
-        mov bx, 6
-        push bx
-        mov bx, 7
-        push bx
-        mov bx, 8
-        push bx
-        call winQ
+        winQ 6 7 8
         cmp bx, 0
         je winX678
         cmp bx, 1
@@ -865,46 +562,16 @@ endp check
         jmp w3
            
         winX678:       
-         mov bx, 11       
-        push bx
-        mov bx,000b4h
-        push bx
-        mov bx,000a0h
-        push bx
-        mov bx,0000ah
-        push bx
-        call draw_row
-        pop bx
-        pop bx
-        pop bx
-        pop bx
+        draw_row 11 000b4h 000a0h 0000ah
         jmp exit
         
         winO678:       
-         mov bx, 11       
-        push bx
-        mov bx,000b4h
-        push bx
-        mov bx,000a0h
-        push bx
-        mov bx,0000ah
-        push bx
-        call draw_row
-        pop bx
-        pop bx
-        pop bx
-        pop bx
+        draw_row 11 000b4h 000a0h 0000ah
         jmp exit 
         
         
         w3:
-        mov bx, 0
-        push bx
-        mov bx, 3
-        push bx
-        mov bx, 6
-        push bx
-        call winQ
+        winQ 0 3 6
         cmp bx, 0
         je winX036
         cmp bx, 1
@@ -912,45 +579,16 @@ endp check
         jmp w4
            
         winX036:       
-         mov bx, 11       
-        push bx
-        mov bx,000b4h
-        push bx
-        mov bx,0000ah
-        push bx
-        mov bx,00028h
-        push bx
-        call draw_column
-        pop bx
-        pop bx
-        pop bx
-        pop bx
+        draw_column 11 000b4h 0000ah 00028h
+        
         jmp exit
         
         winO036:       
-         mov bx, 11       
-        push bx
-        mov bx,000b4h
-        push bx
-        mov bx,0000ah
-        push bx
-        mov bx,00028h
-        push bx
-        call draw_column
-        pop bx
-        pop bx
-        pop bx
-        pop bx
+        draw_column 11 000b4h 0000ah 00028h
         jmp exit 
         
         w4:
-        mov bx, 1
-        push bx
-        mov bx, 4
-        push bx
-        mov bx, 7
-        push bx
-        call winQ
+        winQ 1 4 7
         cmp bx, 0
         je winX147
         cmp bx, 1
@@ -958,188 +596,71 @@ endp check
         jmp w5
            
         winX147:       
-         mov bx, 11       
-        push bx
-        mov bx,000b4h
-        push bx
-        mov bx,0000ah
-        push bx
-        mov bx,00064h
-        push bx
-        call draw_column
-        pop bx
-        pop bx
-        pop bx
-        pop bx
+        draw_column 11 000b4h 0000ah 00064h
         jmp exit
         
         winO147:       
-         mov bx, 11       
-        push bx
-        mov bx,000b4h
-        push bx
-        mov bx,0000ah
-        push bx
-        mov bx,00064h
-        push bx
-        call draw_column
-        pop bx
-        pop bx
-        pop bx
-        pop bx
+        draw_column 11 000b4h 0000ah 00064h
         jmp exit
         
         w5:
-        mov bx, 2
-        push bx
-        mov bx, 5
-        push bx
-        mov bx, 8
-        push bx
-        call winQ
+        winQ 2 5 8
         cmp bx, 0
         je winX258
         cmp bx, 1
         je winO258   
         jmp w6
            
-        winX258:       
-         mov bx, 11       
-        push bx
-        mov bx,000b4h
-        push bx
-        mov bx,0000ah
-        push bx
-        mov bx,000a0h
-        push bx
-        call draw_column
-        pop bx
-        pop bx
-        pop bx
-        pop bx
+                   winX258:       
+        draw_column 11 000b4h 0000ah 000a0h
         jmp exit
         
         winO258:       
-         mov bx, 11       
-        push bx
-        mov bx,000b4h
-        push bx
-        mov bx,0000ah
-        push bx
-        mov bx,000a0h
-        push bx
-        call draw_column
-        pop bx
-        pop bx
-        pop bx
-        pop bx
+        draw_column 11 000b4h 0000ah 000a0h
         jmp exit
         
         w6:
-        mov bx, 0
-        push bx
-        mov bx, 4
-        push bx
-        mov bx, 8
-        push bx
-        call winQ
+        winQ 0 4 8
         cmp bx, 0
         je winX048
         cmp bx, 1
         je winO048   
         jmp w7
            
-        winX048:       
-         mov bx, 11       
-        push bx
-        mov bx,000b4h
-        push bx
-        mov bx,0000ah
-        push bx
-        mov bx,0000ah
-        push bx
-        call draw_diagonal_r
-        pop bx
-        pop bx
-        pop bx
-        pop bx
+        winX048:              
+        draw_diagonal_r 11 000b4h 0000ah 0000ah 
         jmp exit
         
         winO048:       
-         mov bx, 11       
-        push bx
-        mov bx,000b4h
-        push bx
-        mov bx,0000ah
-        push bx
-        mov bx,0000ah
-        push bx
-        call draw_diagonal_r
-        pop bx
-        pop bx
-        pop bx
-        pop bx
+        draw_diagonal_r 11 000b4h 0000ah 0000ah 
         jmp exit
         
-        
-        
-        w7:
-        mov bx, 2
-        push bx
-        mov bx, 4
-        push bx
-        mov bx, 6
-        push bx
-        call winQ
+        w7: 
+        winQ 2 4 6
         cmp bx, 0
         je winX246
         cmp bx, 1
         je winO246   
         jmp w8
            
-        winX246:
-        mov bx, 11       
-        push bx
-        mov bx,000b4h
-        push bx
-        mov bx,000BEh
-        push bx
-        mov bx,0000ah
-        push bx
-        call draw_diagonal_l
-        pop bx
-        pop bx
-        pop bx
-        pop bx
+        winX246:        
+        draw_diagonal_l 11 000b4h 000BEh 0000ah 
         jmp exit
         
         winO246:       
-         mov bx, 11       
-        push bx
-        mov bx,000b4h
-        push bx
-        mov bx,000BEh
-        push bx
-        mov bx,0000ah
-        push bx
-        call draw_diagonal_l
-        pop bx
-        pop bx
-        pop bx
-        pop bx
+        draw_diagonal_l 11 000b4h 000BEh 0000ah
         jmp exit
         
-        
-        
         w8:
-        
         call  check
         cmp bx,0
         je exit
-        jmp loopp
-         
         
-                         
-               
+        writeTextMode 0a1ah [turnTxt] 
+        
+        
+        jmp loopp
     exit:          
     end start
+    
+    
