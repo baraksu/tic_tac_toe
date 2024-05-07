@@ -259,7 +259,40 @@ proc check
     e:
       inc bx    
 ret
-endp check 
+endp check
+
+proc printlogo
+        pusha 
+        lea dx,logo
+        mov ah, 09h
+        int 21h   
+        lea dx,pressKeyToStart
+        mov ah, 09h
+        int 21h   
+        mov ah,01h
+        int 21h
+        popa
+        ret  
+endp printlogo
+
+proc draw_board
+       draw_row color 000b4h 0000ah 0000ah 
+        draw_row color 000b4h 00046h 0000ah 
+        draw_row color 000b4h 00082h 0000ah 
+        draw_row color 000b4h 000BEh 0000ah 
+        draw_column color 000b4h 0000ah 0000ah
+        draw_column color 000b4h 0000ah 00046h
+        draw_column color 000b4h 0000ah 00082h
+        draw_column color 000b4h 0000ah 000BEh
+        writeTextMode 0a1ah [turnTxt]
+        ret
+endp draw_board 
+
+proc click
+     mov ax, 0003h
+     int 33h
+     ret
+endp click
 
 
 writeTextMode macro page location ; page - y,x
@@ -289,38 +322,20 @@ endm writeTextMode
     start:      
         mov ax, @data
         mov ds, ax
-        pusha 
-        lea dx,logo
-        mov ah, 09h
-        int 21h   
-        lea dx,pressKeyToStart
-        mov ah, 09h
-        int 21h   
-        mov ah,01h
-        int 21h
-        popa      
+        
+        call printlogo
+              
         mov ah,0 
         mov al, 13h
 	    int 10h  
         
                                      
-        draw_row color 000b4h 0000ah 0000ah 
-        draw_row color 000b4h 00046h 0000ah 
-        draw_row color 000b4h 00082h 0000ah 
-        draw_row color 000b4h 000BEh 0000ah 
-        draw_column color 000b4h 0000ah 0000ah
-        draw_column color 000b4h 0000ah 00046h
-        draw_column color 000b4h 0000ah 00082h
-        draw_column color 000b4h 0000ah 000BEh
-        writeTextMode 0a1ah [turnTxt]
+        call draw_board
         
         mov ax,0001h
         int 33h
         loopp:
-        
-        mov ax, 0003h
-        int 33h
-        
+        call click
         cmp bx,1
         jne loopp
         
