@@ -1,30 +1,15 @@
 .model small
 .stack 100h
-
 .data   
-                                 
-
 color dw 7
-
-
 Xcolor dw 6
-Ocolor dw 1 
-
+Ocolor dw 1
 board db 2,2,2,2,2,2,2,2,2 ; 0-x, 1 - O
-
 turn db 0
-
-logo db 13,10, " _____ _        _____     _      _____          ",13,10, "|_   _(_) ___  |_   _|_ _| | __ |_   _|__   ___ ",13,10, "  | | | |/ __|   | |/ _` | |/ /   | |/ _ \ / _ \",13,10, "  | | | | (__    | | (_| |   <    | | (_) |  __/",13,10, "  |_| |_|\___|   |_|\__,_|_|\_\   |_|\___/ \___|",13,10,"$"
-
+logo db 13,10, " _____ _        _____     _      _____          ",13,10, "|_   _(_) ___  |_   _|_ _| | __ |_   _|__   ___ ",13,10, "  | | | |/ __|   | |/ _` | |/ /   | |/ _ \ / _ \",13,10, "  | | | | (__    | | (_| |   <    | | (_) |  __/",13,10, "  |_| |_|\___|   |_|\__,_|_|\_\   |_|\___/ \___|",13,10,13,10,"Created by Oriisac Hirschkorn","$"
 turnTxt db "Turn: X$ "
-              
-
 pressKeyToStart db 13,10,"Enter any key to start the game!$"
-
-
 .code
-    
-    
     draw_column macro tcolor length x y 
         local columnDrawLoop
     pusha 
@@ -472,17 +457,11 @@ endm writeTextMode
         drawX:
         mov [turnTxt+6], 'O' 
         mov turn, 1
-         
-        
         push ax
         draw_diagonal_r Xcolor 00032h ax bx 
         add ax, 00032h
         draw_diagonal_l Xcolor 00032h ax bx
         pop ax
-        
-        
-        
-        
         jmp endTurn
         
         ;----------------------;
@@ -662,5 +641,3 @@ endm writeTextMode
         jmp loopp
     exit:          
     end start
-    
-    
